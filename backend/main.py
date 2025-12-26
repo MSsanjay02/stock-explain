@@ -1,5 +1,8 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware 
+from utils.explanation_engine import generate_explanation
+from utils.ai_explanation_engine import generate_ai_explanation
+
 
 from services.stock_service import get_stock_data
 
@@ -24,10 +27,15 @@ def explain_stock(symbol: str, company: str):
     stock_data = get_stock_data(symbol)
 
     if not stock_data:
-        return {"error": "Stock data not available"}
+        return {
+            "error": "Stock data is temporarily unavailable for this symbol."
+        }
+
+    ai_explanation = generate_ai_explanation(stock_data)
 
     return {
         "stock_data": stock_data,
-        "news": [],
-        "data_note": "Price data powered by Yahoo Finance (near real-time)"
+        "ai_explanation": ai_explanation,
+        "note": "AI explanation is based on observable market data and is for educational purposes only."
     }
+
